@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="hexagonal" renderorder="right-down" width="10" height="7" tilewidth="72" tileheight="72" infinite="0" hexsidelength="36" staggeraxis="y" staggerindex="odd" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" source="water.tsx"/>
+ <tileset firstgid="2" source="grass.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="10" height="7">
+  <data encoding="csv">
+2,2,2,2,2,2,2,2,2,2,
+2,2,2,2,2,1,2,2,2,2,
+2,2,2,2,2,1,1,2,2,2,
+2,2,2,2,1,1,2,2,2,2,
+2,2,2,2,2,1,1,2,2,2,
+2,2,2,2,2,1,2,2,2,2,
+2,2,2,2,2,2,2,2,2,2
+</data>
+ </layer>
+</map>
