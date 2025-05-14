@@ -44,14 +44,15 @@ class HexagonComponent extends PositionComponent {
   }
 
   List<Offset> calculateHexagonPoints(Offset center, double size) {
-    final List<Offset> points = [];
+    final List<Offset> vertices = [];
     for (int i = 0; i < 6; i++) {
       final angle = (2 * pi / 6) * i;
       final x = center.dx + size * cos(angle);
       final y = center.dy + size * sin(angle);
-      points.add(Offset(x, y));
+      vertices.add(Offset(x, y));
     }
-    return points;
+
+    return vertices;
   }
 
   // @override
@@ -61,29 +62,12 @@ class HexagonComponent extends PositionComponent {
   // }
 }
 
-bool isTapInsideFlatTopHexagon(Offset tapPoint, List<Offset> vertices) {
-  int n = vertices.length;
-  Offset p1, p2;
-
-  for (int i = 0; i < n; i++) {
-    p1 = vertices[i];
-    p2 = vertices[(i + 1) % n];
-    if (((p1.dy <= tapPoint.dy && tapPoint.dy < p2.dy) ||
-            (p2.dy <= tapPoint.dy && tapPoint.dy < p1.dy)) &&
-        tapPoint.dx <
-            (p2.dx - p1.dx) * (tapPoint.dy - p1.dy) / (p2.dy - p1.dy) + p1.dx) {
-      return true;
-    }
-  }
-  return false;
-}
-
 class HexagonGame extends FlameGame with TapCallbacks {
   final List<HexagonComponent> _hexes = [];
   @override
   Future<void> onLoad() async {
     debugMode = true;
-    final firstHexPosition = Vector2(20, 20);
+    final firstHexPosition = Vector2.all(0);
     final firstHexagonComponent = HexagonComponent(
       id: 1,
       row: 0,
@@ -112,18 +96,32 @@ class HexagonGame extends FlameGame with TapCallbacks {
     );
     add(secondHexagonComponent);
 
+    final thirdHexPos = _calculateNextNegativeStaggeredHexagonPositionRight(
+      secondHexPosition,
+      36,
+    );
+    final thirdHexagonComponent = HexagonComponent(
+      id: 3,
+      row: 0,
+      column: 2,
+      position: thirdHexPos,
+      hexSize: 36,
+      color: Colors.red,
+    );
+    add(thirdHexagonComponent);
+
     final thirdHexOnRow = HexagonComponent(
       row: 0,
       column: 2,
       hexSize: 36,
       id: 4,
-      position: Vector2(128, 20),
+      position: Vector2.all(0),
     );
 
     add(thirdHexOnRow);
 
     final thirdHexPosition = _calculateNextStaggeredRowHexagonPosition(
-      Vector2(20, 20),
+      Vector2.all(0),
       36,
     );
     add(
@@ -137,6 +135,36 @@ class HexagonGame extends FlameGame with TapCallbacks {
       ),
     );
 
+    final fourthHexPosition = _calculateNextStaggeredHexagonPositionRight(
+      thirdHexPosition,
+      36,
+    );
+
+    final fourthHexagonComponent = HexagonComponent(
+      id: 4,
+      row: 1,
+      column: 1,
+      position: fourthHexPosition,
+      hexSize: 36,
+      color: Colors.yellow,
+    );
+    add(fourthHexagonComponent);
+
+    final fifthHexPosition =
+        _calculateNextNegativeStaggeredHexagonPositionRight(
+          fourthHexPosition,
+          36,
+        );
+    final fifthHexagonComponent = HexagonComponent(
+      id: 5,
+      row: 1,
+      column: 2,
+      position: fifthHexPosition,
+      hexSize: 36,
+      color: Colors.brown,
+    );
+    add(fifthHexagonComponent);
+
     print("Third hex position $thirdHexPosition");
     _hexes.addAll([firstHexagonComponent, secondHexagonComponent]);
   }
@@ -147,6 +175,18 @@ class HexagonGame extends FlameGame with TapCallbacks {
   ) {
     final horizontalShift = 1.5 * hexRadius;
     final verticalShift = sqrt(3) / 2 * hexRadius;
+    return Vector2(
+      previousPosition.x + horizontalShift,
+      previousPosition.y + verticalShift,
+    );
+  }
+
+  Vector2 _calculateNextNegativeStaggeredHexagonPositionRight(
+    Vector2 previousPosition,
+    double hexRadius,
+  ) {
+    final horizontalShift = 1.5 * hexRadius;
+    final verticalShift = sqrt(3) / 2 * -hexRadius;
     return Vector2(
       previousPosition.x + horizontalShift,
       previousPosition.y + verticalShift,
@@ -170,13 +210,6 @@ class HexagonGame extends FlameGame with TapCallbacks {
     print("Tapped at ${event.localPosition}");
 
     final offset = Offset(event.localPosition.x, event.localPosition.y);
-
-    for (var hex in _hexes) {
-      final isInside = isTapInsideFlatTopHexagon(offset, hex.points);
-      if (isInside) {
-        print("Tapped inside ${hex.id}");
-      }
-    }
   }
 }
 
