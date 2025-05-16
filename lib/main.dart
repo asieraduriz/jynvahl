@@ -34,7 +34,10 @@ class HexagonComponent extends PositionComponent {
            Paint()
              ..color = color
              ..style = PaintingStyle.fill,
-       super(size: Vector2(hexSize * 2, hexSize * sqrt(3)));
+       super(
+         size: Vector2(hexSize * 2, hexSize * sqrt(3)),
+         anchor: Anchor.center,
+       );
 
   @override
   void render(Canvas canvas) {
@@ -55,13 +58,17 @@ class HexagonComponent extends PositionComponent {
     }
     return vertices;
   }
+
+  void changeColor(Color color) {
+    _paint.color = color;
+  }
 }
 
 class HexagonGame extends FlameGame with TapCallbacks {
   final List<HexagonComponent> _hexes = [];
   final double hexRadius = 36.0;
-  final int numRows = 3;
-  final int numCols = 5;
+  final int numRows = 8;
+  final int numCols = 10;
 
   Vector2 _calculateHexPositionOddQ(int row, int column, double hexRadius) {
     final horizontalSpacing = 1.5 * hexRadius;
@@ -128,6 +135,8 @@ class HexagonGame extends FlameGame with TapCallbacks {
         Vector2(event.localPosition.x, event.localPosition.y),
       )) {
         print("\nPotential hexagon found ${hex.id}");
+        hex.changeColor(Colors.pink);
+        break;
       }
     }
   }
