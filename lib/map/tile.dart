@@ -32,12 +32,15 @@ class HexagonTile extends PositionComponent {
     final center = Offset(width / 2, height / 2);
     _hexagonPoints = calculateHexagonPoints(center, hexSize);
 
-    final textComponent = TextComponent(
-      text: text,
-      textRenderer: TextPaint(
-        style: const TextStyle(fontSize: 12, color: Colors.white),
-      ),
-    )..position = center.toVector2();
+    final textComponent =
+        TextComponent(
+            text: text,
+            textRenderer: TextPaint(
+              style: const TextStyle(fontSize: 12, color: Colors.white),
+            ),
+          )
+          ..position = center.toVector2()
+          ..anchor = Anchor.center;
 
     add(textComponent);
   }

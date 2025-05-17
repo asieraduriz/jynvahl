@@ -24,7 +24,7 @@ Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
 }
 
 class HexagonGame extends FlameGame with TapCallbacks {
-  final List<HexagonTile> _hexes = [];
+  final Map<Hex, HexagonTile> _hexMap = {};
   final double hexRadius = 50.0;
   final int numRows = 7;
   final int numCols = 8;
@@ -36,7 +36,7 @@ class HexagonGame extends FlameGame with TapCallbacks {
     for (int row = 0; row < numRows; row++) {
       for (int col = 0; col < numCols; col++) {
         final origin = calculateHexOrigin(row, col, hexRadius);
-        final id = "hex_${row}_${col}";
+        final id = "hex_${row} ${col}";
 
         final axial_coords = oddq_to_axial(row, col);
         final hexagon = HexagonTile(
@@ -44,25 +44,25 @@ class HexagonGame extends FlameGame with TapCallbacks {
           origin: origin,
           hexSize: hexRadius,
           color: Colors.green,
-          text: "${axial_coords.q}_${axial_coords.r} | ${row}_$col",
+          text: "${axial_coords.q}, ${axial_coords.r}",
         );
+        _hexMap[axial_coords] = hexagon;
         add(hexagon);
-        _hexes.add(hexagon);
       }
     }
-
-    add(new Character());
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    List<HexagonTile> hexes = [];
+    Map<Hex, HexagonTile> hexes = {};
     final tappedAt = Vector2(event.localPosition.x, event.localPosition.y);
     print("\nTapped at: $tappedAt");
-    for (final hex in _hexes) {
-      if (hex.containsPoint(tappedAt)) {
-        print("Potential hexagon found ${hex.position}");
-        hexes.add(hex);
+    for (final entry in _hexMap.entries) {
+      final hex = entry.key;
+      final tile = entry.value;
+      if (tile.containsPoint(tappedAt)) {
+        print("Potential hexagon found ${tile.position}");
+        hexes[hex] = tile;
       }
     }
 
@@ -71,20 +71,32 @@ class HexagonGame extends FlameGame with TapCallbacks {
       return;
     }
     double closestDistanceSquared = double.infinity;
-    HexagonTile closestHex = hexes[0];
+    var closestHex = hexes.entries.first.key;
+    var closestTile = hexes.entries.first.value;
 
-    for (final center in hexes) {
-      final distanceSquared =
-          (tappedAt - center.origin).length2; // Calculate squared distance
+    for (final entry in hexes.entries) {
+      final hex = entry.key;
+      final tile = entry.value;
+      final distanceSquared = (tappedAt - tile.position).length2;
 
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
-        closestHex = center;
+        closestHex = hex;
+        closestTile = tile;
       }
     }
+    closestTile.changeColor(Colors.pink);
 
+    final neighbours = getNeighbourCoordinates(closestHex, 2);
+    print("Neighbours $neighbours");
+
+    neighbours.forEach(
+      (neighbour) => _hexMap[neighbour]?.changeColor(Colors.cyan),
+    );
     // If I click on top-left hexagon, on the top left corner outside of the hexagon, it still indicates I clicked on 0,0 and this is wrong
-    print("Closest hexagon found ${closestHex.id}");
+    print(
+      "Closest hexagon found ${closestHex.q} ${closestHex.r} ${closestTile.id}",
+    );
   }
 }
 

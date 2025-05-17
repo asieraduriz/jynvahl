@@ -51,3 +51,23 @@ Vector2 _calculateHexPositionOddQ(int row, int column, double hexRadius) {
 
   return Vector2(x, y);
 }
+
+List<Hex> getRelativeNeighbourCoordinates(int N) {
+  List<Hex> results = [];
+  for (int q = -N; q <= N; q++) {
+    for (int r = max(-N, -q - N); r <= min(N, -q + N); r++) {
+      if (q == r && q == 0) continue;
+      results.add(Hex(q.toDouble(), r.toDouble()));
+    }
+  }
+
+  return results;
+}
+
+List<Hex> getNeighbourCoordinates(Hex origin, int N) {
+  final neighbours = getRelativeNeighbourCoordinates(N);
+
+  return neighbours
+      .map((neighbour) => Hex(origin.q + neighbour.q, origin.r + neighbour.r))
+      .toList();
+}
