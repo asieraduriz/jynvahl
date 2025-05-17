@@ -5,6 +5,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:jynvahl_hex_game/character.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
+import 'package:jynvahl_hex_game/map/pathfinding.dart';
 import 'package:jynvahl_hex_game/map/tile.dart';
 
 Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
@@ -39,12 +40,14 @@ class HexagonGame extends FlameGame with TapCallbacks {
         final id = "hex_${row} ${col}";
 
         final axial_coords = oddq_to_axial(row, col);
+        final isImpassable = axial_coords.q == 1 && axial_coords.r > 0;
         final hexagon = HexagonTile(
           id: id,
           origin: origin,
           hexSize: hexRadius,
-          color: Colors.green,
+          color: isImpassable ? Colors.blueGrey : Colors.green,
           text: "${axial_coords.q}, ${axial_coords.r}",
+          isImpassable: isImpassable,
         );
         _hexMap[axial_coords] = hexagon;
         add(hexagon);
@@ -93,6 +96,13 @@ class HexagonGame extends FlameGame with TapCallbacks {
     neighbours.forEach(
       (neighbour) => _hexMap[neighbour]?.changeColor(Colors.cyan),
     );
+
+    final path = findPathAStar(
+      start: Hex(0, 5),
+      end: Hex(3, 4),
+      hexMap: _hexMap,
+    );
+    path?.forEach((hex) => _hexMap[hex]?.changeColor(Colors.brown));
     // If I click on top-left hexagon, on the top left corner outside of the hexagon, it still indicates I clicked on 0,0 and this is wrong
     print(
       "Closest hexagon found ${closestHex.q} ${closestHex.r} ${closestTile.id}",
