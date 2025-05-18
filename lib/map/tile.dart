@@ -12,6 +12,7 @@ class HexagonTile extends PositionComponent {
   final Paint _paint;
   final double hexSize;
   final bool isImpassable;
+  late bool isPlaceable;
 
   late List<Offset> _hexagonPoints = [];
 
@@ -21,6 +22,7 @@ class HexagonTile extends PositionComponent {
     required this.hexSize,
     required this.isImpassable,
     required String text,
+    required this.isPlaceable,
     Color color = Colors.blue,
   }) : _paint =
            Paint()
