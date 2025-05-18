@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:jynvahl_hex_game/main.dart';
+import 'package:jynvahl_hex_game/battleground/game.dart';
 
-class Character extends SpriteComponent with HasGameReference<HexagonGame> {
+class Character extends SpriteComponent with HasGameReference<Battleground> {
   Character()
     : super(
         size: Vector2.all(50),
