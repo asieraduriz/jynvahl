@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:jynvahl_hex_game/battleground/hud.dart';
 import 'package:jynvahl_hex_game/battleground/manager.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
 import 'package:jynvahl_hex_game/map/onMapTapController.dart';
@@ -15,7 +16,7 @@ Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
   final horizontalSpacing = 1.5 * hexRadius;
   final verticalSpacing = sqrt(3) * hexRadius;
   final startX = 50.0;
-  final startY = 50.0;
+  final startY = 150.0;
 
   double x = startX + column * horizontalSpacing;
   double y = startY + row * verticalSpacing;
@@ -63,6 +64,8 @@ class Battleground extends FlameGame with TapCallbacks {
 
     // load opponent units
     loadOpponentUnits();
+
+    add(Hud());
   }
 
   void loadMap(String mapId) {
