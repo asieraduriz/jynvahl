@@ -37,9 +37,9 @@ class Battleground extends FlameGame with TapCallbacks {
   final Map<Hex, HexagonTile> _hexMap = {};
 
   final Player player;
-  late final List<Unit> _playerPlayableUnits;
+  late final List<Unit> playerPlayableUnits;
   //lineups, nice name
-  final Map<Hex, PlayingUnit> _playerUnits = {};
+  final Map<Hex, PlayingUnit> playerUnits = {};
   final Map<Hex, PlayingUnit> _opponentUnits = {};
 
   late BattlegroundManager battlegroundManager;
@@ -54,7 +54,7 @@ class Battleground extends FlameGame with TapCallbacks {
       battlegroundManager,
     );
 
-    _playerPlayableUnits =
+    playerPlayableUnits =
         player.units.map((unit) => Unit(name: unit.name)).toList();
   }
 
@@ -140,10 +140,10 @@ class Battleground extends FlameGame with TapCallbacks {
         }
         final hex = closestHex.key, tile = closestHex.value;
         // if tile has unit, remove unit and make placeable
-        if (!tile.isPlaceable && _playerUnits[hex] != null) {
-          final playingUnit = _playerUnits[hex]!;
-          _playerPlayableUnits.add(Unit(name: playingUnit.name));
-          _playerUnits.remove(hex);
+        if (!tile.isPlaceable && playerUnits[hex] != null) {
+          final playingUnit = playerUnits[hex]!;
+          playerPlayableUnits.add(Unit(name: playingUnit.name));
+          playerUnits.remove(hex);
           tile.isPlaceable = true;
           tile.changeColor(Colors.lightBlue);
           playingUnit.removeFromParent();
@@ -151,19 +151,19 @@ class Battleground extends FlameGame with TapCallbacks {
           return;
         }
 
-        if (_playerPlayableUnits.isEmpty) {
+        if (playerPlayableUnits.isEmpty) {
           print("No more units to place, please start");
           return;
         }
 
         // if tile has no unit, place unit
         if (tile.isPlaceable) {
-          final unit = _playerPlayableUnits.removeAt(0);
+          final unit = playerPlayableUnits.removeAt(0);
           final playingUnit = PlayingUnit(
             position: tile.position,
             name: unit.name,
           )..flipHorizontallyAroundCenter();
-          _playerUnits[hex] = playingUnit;
+          playerUnits[hex] = playingUnit;
           tile.isPlaceable = false;
           tile.changeColor(Colors.green);
 

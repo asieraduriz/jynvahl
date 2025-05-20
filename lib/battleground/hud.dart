@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
+import 'package:jynvahl_hex_game/battleground/hud_unit_portrait.dart';
 
 class Hud extends PositionComponent with HasGameReference<Battleground> {
   Hud({
@@ -26,6 +27,18 @@ class Hud extends PositionComponent with HasGameReference<Battleground> {
       position: Vector2(game.size.x - 60, 20),
     );
     add(_scoreTextComponent);
+
+    for (var i = 0; i < game.playerPlayableUnits.length; i++) {
+      final positionX = 48.0 * (i + 1);
+      final unit = game.playerPlayableUnits[i];
+      add(
+        HudUnitPortrait(
+          position: Vector2(positionX, 30),
+          size: Vector2.all(48),
+          index: i,
+        ),
+      );
+    }
 
     // final starSprite = await game.loadSprite('star.png');
     // add(
