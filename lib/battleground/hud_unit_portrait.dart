@@ -7,7 +7,7 @@ import 'package:jynvahl_hex_game/battleground/game.dart';
 enum UnitPortraitState { idle, selected, deployed }
 
 class HudUnitPortrait extends SpriteGroupComponent<UnitPortraitState>
-    with HasGameReference<Battleground>, TapCallbacks {
+    with HasGameReference<JynvahlGame>, TapCallbacks {
   final int index;
 
   HudUnitPortrait({

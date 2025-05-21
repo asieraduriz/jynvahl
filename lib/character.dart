@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
 
-class Character extends SpriteComponent with HasGameReference<Battleground> {
+class Character extends SpriteComponent with HasGameReference<JynvahlGame> {
   Character()
     : super(
         size: Vector2.all(50),
