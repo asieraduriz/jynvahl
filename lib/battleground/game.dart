@@ -23,7 +23,7 @@ class JynvahlGame extends FlameGame with TapCallbacks {
           'home': Route(() => battleground),
           'battle': Route(Skeleton.new),
         },
-        initialRoute: 'home',
+        initialRoute: 'battle',
       ),
     );
   }

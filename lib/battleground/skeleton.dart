@@ -1,25 +1,32 @@
-import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
-import 'package:jynvahl_hex_game/battleground/hud.dart';
-import 'package:jynvahl_hex_game/battleground/manager.dart';
-import 'package:jynvahl_hex_game/map/hex.dart';
-import 'package:jynvahl_hex_game/map/onMapTapController.dart';
-import 'package:jynvahl_hex_game/map/pathfinding.dart';
-import 'package:jynvahl_hex_game/map/tile.dart';
-import 'package:jynvahl_hex_game/players/player.dart';
-import 'package:jynvahl_hex_game/players/unit.dart';
+import 'package:jynvahl_hex_game/battleground/game.dart';
 
 final double hexRadius = 50.0;
 final int numRows = 7;
 final int numCols = 8;
 
-class Skeleton extends PositionComponent {
+class Skeleton extends PositionComponent
+    with TapCallbacks, HasGameReference<JynvahlGame> {
+  Skeleton()
+    : super(priority: 10, size: Vector2(500, 300), position: Vector2(200, 150));
   @override
   Future<void> onLoad() async {
-    add(Hud());
+    debugMode = true;
+    final sprite = await game.loadSprite('water.png');
+    add(
+      SpriteComponent(
+        sprite: sprite,
+        position: Vector2(200, 150),
+        size: Vector2.all(200),
+        anchor: Anchor.center,
+      ),
+    );
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    game.router.pushNamed('home');
+    print('Tapped at ${event.localPosition}');
   }
 }
