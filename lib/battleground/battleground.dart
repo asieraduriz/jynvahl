@@ -163,10 +163,14 @@ class Battleground extends PositionComponent with TapCallbacks {
                 .state = TroopState.idle;
 
             // Handle selected HUD troop
-
             final firstIdleTroop = hudTroops.firstWhere(
               (troop) => troop.state == TroopState.idle,
             );
+            hudTroops.forEach((troop) {
+              if (troop.state == TroopState.selected) {
+                troop.state = TroopState.idle;
+              }
+            });
             firstIdleTroop.state = TroopState.selected;
 
             // Remove deployed sprite
@@ -190,7 +194,6 @@ class Battleground extends PositionComponent with TapCallbacks {
               print("No available troops to deploy");
               return;
             }
-            print("Selected troop is ${selectedTroop.index}");
 
             selectedTroop.state = TroopState.deployed;
             playerLineup[hex] = selectedTroop.unit;
@@ -222,6 +225,87 @@ class Battleground extends PositionComponent with TapCallbacks {
 
     // Maybe other type of tiles have useful information, so don't disregard them
   }
+
+  void onHudTroopTapped(HudTroop tappedHudTroop) {
+    if (tappedHudTroop.state == TroopState.idle) {
+      hudTroops.forEach((troop) {
+        if (troop.state != TroopState.deployed) {
+          troop.state = TroopState.idle;
+        }
+      });
+      tappedHudTroop.state = TroopState.selected;
+
+      return;
+    }
+
+    if (tappedHudTroop.state == TroopState.selected) {
+      final selectedTroop = hudTroops.firstWhereOrNull(
+        (hudTroop) => hudTroop.state == TroopState.selected,
+      );
+
+      if (selectedTroop == null) {
+        print("No available troops to deploy");
+        return;
+      }
+
+      final firstAvailableHex =
+          playerLineup.entries.firstWhere((entry) => entry.value == null).key;
+      final firstAvailableTile = _hexMap[firstAvailableHex];
+      playerLineup[firstAvailableHex] = selectedTroop.unit;
+
+      final playingUnit = PlayingUnit(
+        position: firstAvailableTile!.position,
+        name: selectedTroop.unit.name,
+      )..flipHorizontallyAroundCenter();
+
+      deployedSprites.add(playingUnit);
+      add(playingUnit);
+
+      selectedTroop.state = TroopState.deployed;
+      // And make next troop in HUD selected
+      final firstIdleTroop = hudTroops.firstWhereOrNull(
+        (troop) => troop.state == TroopState.idle,
+      );
+      firstIdleTroop?.state = TroopState.selected;
+
+      return;
+    }
+
+    if (tappedHudTroop.state == TroopState.deployed) {
+      final matchingLineupTroop = playerLineup.entries.firstWhere(
+        (entry) => entry.value?.id == tappedHudTroop.unit.id,
+      );
+      print("Deployed troop tapped at hex ${matchingLineupTroop.key}");
+
+      playerLineup[matchingLineupTroop.key] = null;
+
+      hudTroops.forEach((troop) {
+        if (troop.state != TroopState.deployed) {
+          troop.state = TroopState.idle;
+        }
+      });
+      tappedHudTroop.state = TroopState.selected;
+
+      // Remove deployed sprite
+      final spriteToDelete = deployedSprites.firstWhere(
+        (deployedUnit) => deployedUnit.name == tappedHudTroop.unit.name,
+      );
+      deployedSprites.remove(spriteToDelete);
+      spriteToDelete.removeFromParent();
+      return;
+    }
+  }
+  // switch (selectedTroop.state) {
+  //   case TroopState.idle:
+  //     selectedTroop.state = TroopState.selected;
+  //     break;
+  //   case TroopState.selected:
+  //     selectedTroop.state = TroopState.deployed;
+  //     break;
+  //   case TroopState.deployed:
+  //     selectedTroop.state = TroopState.idle;
+  //     break;
+  // }
 
   Map<Hex, HexagonTile> _nativelyFindBoudingHex(Vector2 tappedAt) =>
       Map.fromEntries(

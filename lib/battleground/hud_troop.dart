@@ -63,21 +63,6 @@ class HudTroop extends PositionComponent
 
   @override
   void onTapUp(TapUpEvent event) {
-    super.onTapUp(event);
-    print("Tapped on troop $index");
-
-    switch (state) {
-      case TroopState.idle:
-        state = TroopState.selected;
-        break;
-      case TroopState.selected:
-        state = TroopState.deployed;
-        break;
-      case TroopState.deployed:
-        state = TroopState.idle;
-        break;
-    }
-
-    setBackground();
+    game.battleground.onHudTroopTapped(this);
   }
 }
