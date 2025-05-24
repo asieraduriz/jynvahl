@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -39,14 +40,13 @@ class Battleground extends PositionComponent with TapCallbacks {
   final Map<Hex, HexagonTile> _hexMap = {};
 
   final Player player;
-  late final List<Unit> playerPlayableUnits;
-  late final Map<Unit, Hex?> playerLineup;
-  //lineups, nice name
-  final Map<Hex, PlayingUnit> playerUnits = {};
+  final Map<Hex, Unit?> playerLineup = {};
+  final List<HudTroop> hudTroops = [];
+  final List<PlayingUnit> deployedSprites = [];
+
   final Map<Hex, PlayingUnit> _opponentUnits = {};
 
   late BattlegroundManager battlegroundManager;
-  late OnMapTapController onMapTapController;
 
   Battleground({
     required this.mapId,
@@ -55,18 +55,6 @@ class Battleground extends PositionComponent with TapCallbacks {
   }) : super(size: size) {
     this.battlegroundManager = BattlegroundManager(mapId: mapId)
       ..battleState = BattleState.placing;
-
-    this.onMapTapController = OnMapTapController(
-      this._hexMap,
-      battlegroundManager,
-    );
-
-    playerPlayableUnits =
-        player.units.map((unit) => Unit(name: unit.name)).toList();
-
-    playerLineup = Map.fromEntries(
-      player.units.map((unit) => MapEntry(unit, null)),
-    );
   }
 
   @override
@@ -77,18 +65,19 @@ class Battleground extends PositionComponent with TapCallbacks {
     loadOpponentUnits();
     // add(HudTroop(position: Vector2(68.0, 20), size: Vector2.all(70)));
 
-    for (int i = 0; i < playerPlayableUnits.length; i++) {
-      final positionX = 40 + (70.0 * i);
-      final unit = playerPlayableUnits[i];
-      add(
-        HudTroop(
-          position: Vector2(positionX, 30),
-          size: Vector2.all(48),
-          index: i,
-          state: i == 0 ? TroopState.selected : TroopState.idle,
-        ),
+    // Adding items to the "HUD"
+    player.units.forEachIndexed((index, unit) {
+      final positionX = 40 + (70.0 * index);
+      final hudTroop = HudTroop(
+        position: Vector2(positionX, 30),
+        size: Vector2.all(48),
+        index: index,
+        state: index == 0 ? TroopState.selected : TroopState.idle,
+        unit: unit,
       );
-    }
+      hudTroops.add(hudTroop);
+      add(hudTroop);
+    });
   }
 
   void loadMap(String mapId) {
@@ -100,14 +89,12 @@ class Battleground extends PositionComponent with TapCallbacks {
         final axial_coords = oddq_to_axial(row, col);
         final isImpassable = axial_coords.q == 1 && axial_coords.r > 0;
 
-        final isPlaceable =
-            this.battlegroundManager.battleState == BattleState.placing &&
-            [
-              Hex(1, 0),
-              Hex(2, 0),
-              Hex(0, 3),
-              Hex(2, -1),
-            ].contains(axial_coords);
+        final isPlaceable = [
+          Hex(1, 0),
+          Hex(2, 0),
+          Hex(0, 3),
+          Hex(2, -1),
+        ].contains(axial_coords);
 
         final hexagon = HexagonTile(
           id: id,
@@ -125,6 +112,9 @@ class Battleground extends PositionComponent with TapCallbacks {
         );
 
         _hexMap[axial_coords] = hexagon;
+        if (isPlaceable) {
+          playerLineup[axial_coords] = null;
+        }
         add(hexagon);
       }
     }
@@ -160,63 +150,77 @@ class Battleground extends PositionComponent with TapCallbacks {
           return;
         }
         final hex = closestHex.key, tile = closestHex.value;
-        // if tile has unit, remove unit and make placeable
-        if (!tile.isPlaceable && playerUnits[hex] != null) {
-          final playingUnit = playerUnits[hex]!;
-          playerPlayableUnits.add(Unit(name: playingUnit.name));
-          playerUnits.remove(hex);
-          tile.isPlaceable = true;
-          tile.changeColor(Colors.lightBlue);
-          playingUnit.removeFromParent();
 
-          return;
-        }
-
-        if (playerPlayableUnits.isEmpty) {
-          print("No more units to place, please start");
-          return;
-        }
-
-        // if tile has no unit, place unit
         if (tile.isPlaceable) {
-          final unit = playerPlayableUnits.removeAt(0);
-          final playingUnit = PlayingUnit(
-            position: tile.position,
-            name: unit.name,
-          )..flipHorizontallyAroundCenter();
-          playerUnits[hex] = playingUnit;
-          tile.isPlaceable = false;
-          tile.changeColor(Colors.green);
+          // if tile has unit, remove unit
+          if (playerLineup[hex] != null) {
+            print("There is already a unit");
+            final deployedTroop = playerLineup[hex]!;
+            playerLineup[hex] = null;
 
-          add(playingUnit);
+            hudTroops
+                .firstWhere((troop) => troop.unit.id == deployedTroop.id)
+                .state = TroopState.idle;
 
-          return;
+            // Handle selected HUD troop
+
+            final firstIdleTroop = hudTroops.firstWhere(
+              (troop) => troop.state == TroopState.idle,
+            );
+            firstIdleTroop.state = TroopState.selected;
+
+            // Remove deployed sprite
+            final spriteToDelete = deployedSprites.firstWhere(
+              (deployedUnit) => deployedUnit.name == deployedTroop.name,
+            );
+
+            deployedSprites.remove(spriteToDelete);
+            spriteToDelete.removeFromParent();
+
+            return;
+          }
+
+          if (playerLineup[hex] == null) {
+            // If tile has no unit, deploy selected troop from HUD if there's any selected
+            final selectedTroop = hudTroops.firstWhereOrNull(
+              (hudTroop) => hudTroop.state == TroopState.selected,
+            );
+
+            if (selectedTroop == null) {
+              print("No available troops to deploy");
+              return;
+            }
+            print("Selected troop is ${selectedTroop.index}");
+
+            selectedTroop.state = TroopState.deployed;
+            playerLineup[hex] = selectedTroop.unit;
+
+            final playingUnit = PlayingUnit(
+              position: tile.position,
+              name: selectedTroop.unit.name,
+            )..flipHorizontallyAroundCenter();
+
+            deployedSprites.add(playingUnit);
+            add(playingUnit);
+
+            // And make next troop in HUD selected
+            final firstIdleTroop = hudTroops.firstWhereOrNull(
+              (troop) => troop.state == TroopState.idle,
+            );
+            firstIdleTroop?.state = TroopState.selected;
+          }
         }
 
         break;
 
       default:
+        print(
+          "Other state ${battlegroundManager.battleState} not implemented yet",
+        );
         break;
     }
-    // onMapTapController.onTapUp(event);
 
-    // final neighbours = getNeighbourCoordinates(closestHex, 2);
-    // print("Neighbours $neighbours");
-
-    // neighbours.forEach(
-    //   (neighbour) => _hexMap[neighbour]?.changeColor(Colors.cyan),
-    // );
-
-    // final path = findPathAStar(
-    //   start: Hex(0, 5),
-    //   end: Hex(3, 4),
-    //   hexMap: _hexMap,
-    // );
-    // path?.forEach((hex) => _hexMap[hex]?.changeColor(Colors.brown));
-    // If I click on top-left hexagon, on the top left corner outside of the hexagon, it still indicates I clicked on 0,0 and this is wrong
-    // print(
-    //   "Closest hexagon found ${closestHex.q} ${closestHex.r} ${closestTile.id}",
-    // );
+    // Maybe other type of tiles have useful information, so don't disregard them
   }
 
   Map<Hex, HexagonTile> _nativelyFindBoudingHex(Vector2 tappedAt) =>

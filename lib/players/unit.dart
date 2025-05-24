@@ -5,9 +5,10 @@ import 'package:jynvahl_hex_game/battleground/battleground.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
 
 class Unit {
+  int id;
   String name;
 
-  Unit({required this.name});
+  Unit({required this.id, required this.name});
 }
 
 class PlayingUnit extends SpriteComponent with HasGameReference<JynvahlGame> {
