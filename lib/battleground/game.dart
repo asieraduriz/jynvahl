@@ -16,14 +16,14 @@ class JynvahlGame extends FlameGame with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    battleground = Battleground(mapId: mapId, player: player);
+    battleground = Battleground(mapId: mapId, player: player, size: size);
     add(
       router = RouterComponent(
         routes: {
           'home': Route(() => battleground),
           'battle': Route(Skeleton.new),
         },
-        initialRoute: 'battle',
+        initialRoute: 'home',
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:jynvahl_hex_game/battleground/hud.dart';
+import 'package:jynvahl_hex_game/battleground/hud_troop.dart';
 import 'package:jynvahl_hex_game/battleground/manager.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
 import 'package:jynvahl_hex_game/map/onMapTapController.dart';
@@ -39,6 +40,7 @@ class Battleground extends PositionComponent with TapCallbacks {
 
   final Player player;
   late final List<Unit> playerPlayableUnits;
+  late final Map<Unit, Hex?> playerLineup;
   //lineups, nice name
   final Map<Hex, PlayingUnit> playerUnits = {};
   final Map<Hex, PlayingUnit> _opponentUnits = {};
@@ -46,7 +48,11 @@ class Battleground extends PositionComponent with TapCallbacks {
   late BattlegroundManager battlegroundManager;
   late OnMapTapController onMapTapController;
 
-  Battleground({required this.mapId, required this.player}) {
+  Battleground({
+    required this.mapId,
+    required this.player,
+    required Vector2 size,
+  }) : super(size: size) {
     this.battlegroundManager = BattlegroundManager(mapId: mapId)
       ..battleState = BattleState.placing;
 
@@ -57,17 +63,32 @@ class Battleground extends PositionComponent with TapCallbacks {
 
     playerPlayableUnits =
         player.units.map((unit) => Unit(name: unit.name)).toList();
+
+    playerLineup = Map.fromEntries(
+      player.units.map((unit) => MapEntry(unit, null)),
+    );
   }
 
   @override
   Future<void> onLoad() async {
-    debugMode = true;
     loadMap(mapId);
 
-    // load opponent units
+    // load opponent unitsl
     loadOpponentUnits();
+    // add(HudTroop(position: Vector2(68.0, 20), size: Vector2.all(70)));
 
-    add(Hud());
+    for (int i = 0; i < playerPlayableUnits.length; i++) {
+      final positionX = 40 + (70.0 * i);
+      final unit = playerPlayableUnits[i];
+      add(
+        HudTroop(
+          position: Vector2(positionX, 30),
+          size: Vector2.all(48),
+          index: i,
+          state: i == 0 ? TroopState.selected : TroopState.idle,
+        ),
+      );
+    }
   }
 
   void loadMap(String mapId) {
