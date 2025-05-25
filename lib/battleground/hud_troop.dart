@@ -31,7 +31,7 @@ class HudTroop extends PositionComponent
     setBackground();
     add(backgroundRectange);
 
-    final image = await game.loadSprite('unit_infantry_germany.png');
+    final image = await game.loadSprite(troop.spritePath);
     troopPortrait = SpriteComponent(sprite: image, size: size);
     if (state == TroopState.idle) {
       troopPortrait.flipHorizontallyAroundCenter();

@@ -38,10 +38,26 @@ class Battleground extends PositionComponent with TapCallbacks {
       ..battleState = BattleState.placing;
 
     _opponentLineup.addAll({
-      Hex(5, 2): Troop(id: 1, name: "Frost Troll Warrior"),
-      Hex(6, 1): Troop(id: 2, name: "Frost Troll Archer"),
-      Hex(6, 2): Troop(id: 3, name: "Frost Troll Shaman"),
-      Hex(7, -1): Troop(id: 4, name: "Frost Troll Berserker"),
+      Hex(5, 2): Troop(
+        id: -1,
+        name: "Frost Troll Warrior",
+        spritePath: 'unit_infantry_orange.png',
+      ),
+      Hex(6, 1): Troop(
+        id: -2,
+        name: "Frost Troll Archer",
+        spritePath: 'unit_infantry_orange.png',
+      ),
+      Hex(6, 2): Troop(
+        id: -3,
+        name: "Frost Troll Shaman",
+        spritePath: 'unit_infantry_orange.png',
+      ),
+      Hex(7, -1): Troop(
+        id: -4,
+        name: "Frost Troll Berserker",
+        spritePath: 'unit_infantry_orange.png',
+      ),
     });
   }
 
@@ -69,6 +85,8 @@ class Battleground extends PositionComponent with TapCallbacks {
       final playingTroop = PlayingTroop(
         position: _hexMap[hex]!.position,
         name: troop.name,
+        id: troop.id,
+        spritePath: troop.spritePath,
       );
 
       add(playingTroop);
@@ -162,6 +180,8 @@ class Battleground extends PositionComponent with TapCallbacks {
             final playingTrool = PlayingTroop(
               position: tile.position,
               name: selectedTroop.troop.name,
+              id: selectedTroop.troop.id,
+              spritePath: selectedTroop.troop.spritePath,
             )..flipHorizontallyAroundCenter();
 
             deployedSprites.add(playingTrool);
@@ -219,9 +239,12 @@ class Battleground extends PositionComponent with TapCallbacks {
       final playingTroop = PlayingTroop(
         position: firstAvailableTile!.position,
         name: selectedTroop.troop.name,
+        id: selectedTroop.troop.id,
+        spritePath: selectedTroop.troop.spritePath,
       )..flipHorizontallyAroundCenter();
 
       deployedSprites.add(playingTroop);
+      bottomHud.addDeployedTroop(selectedTroop.troop);
       add(playingTroop);
 
       selectedTroop.state = TroopState.deployed;
@@ -254,6 +277,7 @@ class Battleground extends PositionComponent with TapCallbacks {
         (deployedTrool) => deployedTrool.name == tappedHudTroop.troop.name,
       );
       deployedSprites.remove(spriteToDelete);
+      bottomHud.removeDeployedTroop(tappedHudTroop.troop);
       spriteToDelete.removeFromParent();
       return;
     }

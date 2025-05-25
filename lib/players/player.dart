@@ -5,9 +5,9 @@ class Player {
 
   Player() {
     troops.addAll([
-      Troop(id: 1, name: "Gnoll"),
-      Troop(id: 2, name: "Orc"),
-      Troop(id: 3, name: "Troll"),
+      Troop(id: 1, name: "Gnoll", spritePath: "unit_infantry_germany.png"),
+      Troop(id: 2, name: "Orc", spritePath: "unit_infantry_blue.png"),
+      Troop(id: 3, name: "Troll", spritePath: "unit_infantry_red.png"),
     ]);
   }
 }

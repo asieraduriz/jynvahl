@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
 import 'package:jynvahl_hex_game/players/troop.dart';
 
 class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
-  List<PositionComponent> playerLineup = [];
+  List<Troop> playerLineup = [];
   final List<Troop> opponentLineup;
 
   BottomHud({required Vector2 size, required this.opponentLineup})
@@ -34,33 +35,56 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
 
     // Add opponent lineup
     for (var i = 0; i < opponentLineup.length; i++) {
-      final component = PositionComponent(
-        size: Vector2(50, 50),
-        position: Vector2(size.x / 2 + (i + 1) * 60, size.y / 2),
-        anchor: Anchor.center,
-        children: [
-          SpriteComponent(
-            sprite: await game.loadSprite('unit_infantry_germany.png'),
-            size: Vector2(50, 50),
-          ),
-        ],
+      final troop = opponentLineup[i];
+      final component = PlayingTroop(
+        position: Vector2(size.x / 2 + (i + 1) * 70, size.y / 2),
+        name: troop.name,
+        id: troop.id,
+        spritePath: troop.spritePath,
       );
+
       add(component);
-      playerLineup.add(component);
     }
   }
 
-  addDeployedTroop(PositionComponent component) {
-    playerLineup.add(component);
-    component.position = Vector2(
-      size.x / 2 + (playerLineup.length - 1) * 60,
-      size.y / 2,
+  addDeployedTroop(Troop troop) {
+    playerLineup.add(troop);
+    print("Added troop, total is ${playerLineup.length}");
+    final playingTroop = PlayingTroop(
+      position: Vector2(size.x / 2 - (playerLineup.length) * 70, size.y / 2),
+      name: troop.name,
+      id: troop.id,
+      spritePath: troop.spritePath,
     );
-    add(component);
+
+    add(playingTroop);
   }
 
-  removeDeployedTroop(PositionComponent component) {
-    playerLineup.remove(component);
-    component.removeFromParent();
+  removeDeployedTroop(Troop troop) {
+    // Remove all player troops from HUD
+    print("Player lineup: ${playerLineup.map((e) => e.id).join(', ')}");
+    children.whereType<PlayingTroop>().forEach((troopComponent) {
+      final isPlayerTroop = playerLineup.any(
+        (troopEntry) => troopEntry.id == troopComponent.id,
+      );
+
+      if (isPlayerTroop) {
+        troopComponent.removeFromParent();
+      }
+    });
+
+    // Remove troop from player lineup
+    playerLineup.removeWhere((entry) => entry.id == troop.id);
+
+    // Add remaining troops to HUD
+    playerLineup.forEachIndexed((index, remainingTroop) {
+      final playingTroop = PlayingTroop(
+        position: Vector2(size.x / 2 - (index + 1) * 70, size.y / 2),
+        name: remainingTroop.name,
+        id: remainingTroop.id,
+        spritePath: remainingTroop.spritePath,
+      );
+      add(playingTroop);
+    });
   }
 }

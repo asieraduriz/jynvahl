@@ -6,18 +6,25 @@ import 'package:jynvahl_hex_game/battleground/game.dart';
 class Troop {
   int id;
   String name;
+  String spritePath;
 
-  Troop({required this.id, required this.name});
+  Troop({required this.id, required this.name, required this.spritePath});
 }
 
 class PlayingTroop extends SpriteComponent with HasGameReference<JynvahlGame> {
+  int id;
   String name;
-  PlayingTroop({required Vector2 position, required this.name})
-    : super(size: Vector2.all(60), anchor: Anchor.center, position: position);
+  String spritePath;
+  PlayingTroop({
+    required Vector2 position,
+    required this.name,
+    required this.id,
+    required this.spritePath,
+  }) : super(size: Vector2.all(60), anchor: Anchor.center, position: position);
 
   @override
   FutureOr<void> onLoad() async {
-    final spriteImage = await game.images.load('unit_infantry_germany.png');
+    final spriteImage = await game.images.load(spritePath);
     sprite = Sprite(spriteImage);
   }
 

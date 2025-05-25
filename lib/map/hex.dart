@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flame/game.dart';
-
 class Hex {
   final double q;
   final double r;
