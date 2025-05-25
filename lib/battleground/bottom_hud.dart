@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:jynvahl_hex_game/battleground/bottom_hud_button.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
 import 'package:jynvahl_hex_game/players/troop.dart';
 
 class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
   List<Troop> playerLineup = [];
   final List<Troop> opponentLineup;
+
+  late BottomHudButton startButton;
 
   BottomHud({required Vector2 size, required this.opponentLineup})
     : super(size: size, anchor: Anchor.bottomCenter, priority: 10);
@@ -19,19 +22,12 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
     size = Vector2(game.size.x, 200);
     position = Vector2(game.size.x / 2, game.size.y);
 
-    final textComponent = TextComponent(
-      text: "Start",
-      textRenderer: TextPaint(
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      anchor: Anchor.center,
-      position: size / 2,
-    );
-    add(textComponent);
+    startButton =
+        BottomHudButton()
+          ..anchor = Anchor.center
+          ..position = Vector2(size.x / 2, size.y / 2)
+          ..size = Vector2(100, 50);
+    add(startButton);
 
     // Add opponent lineup
     for (int i = 0; i < opponentLineup.length; i++) {
@@ -85,5 +81,18 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
       );
       add(playingTroop);
     });
+  }
+
+  List<PlayingTroop> getDeployedPlayerTroops() {
+    return children.whereType<PlayingTroop>().where((troop) {
+      return playerLineup.any((playerTroop) => playerTroop.id == troop.id);
+    }).toList();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    startButton.isDisabled = getDeployedPlayerTroops().isEmpty;
   }
 }
