@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:jynvahl_hex_game/battleground/battleground.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
 
-class Unit {
+class Troop {
   int id;
   String name;
 
-  Unit({required this.id, required this.name});
+  Troop({required this.id, required this.name});
 }
 
-class PlayingUnit extends SpriteComponent with HasGameReference<JynvahlGame> {
+class PlayingTroop extends SpriteComponent with HasGameReference<JynvahlGame> {
   String name;
-  PlayingUnit({required Vector2 position, required this.name})
+  PlayingTroop({required Vector2 position, required this.name})
     : super(size: Vector2.all(60), anchor: Anchor.center, position: position);
 
   @override

@@ -1,13 +1,13 @@
-import 'package:jynvahl_hex_game/players/unit.dart';
+import 'package:jynvahl_hex_game/players/troop.dart';
 
 class Player {
-  late List<Unit> units = [];
+  late List<Troop> troops = [];
 
   Player() {
-    units.addAll([
-      Unit(id: 1, name: "Gnoll"),
-      Unit(id: 2, name: "Orc"),
-      Unit(id: 3, name: "Troll"),
+    troops.addAll([
+      Troop(id: 1, name: "Gnoll"),
+      Troop(id: 2, name: "Orc"),
+      Troop(id: 3, name: "Troll"),
     ]);
   }
 }

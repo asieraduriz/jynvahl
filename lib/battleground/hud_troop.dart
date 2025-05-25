@@ -2,18 +2,18 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:jynvahl_hex_game/battleground/game.dart';
-import 'package:jynvahl_hex_game/players/unit.dart';
+import 'package:jynvahl_hex_game/players/troop.dart';
 
 enum TroopState { idle, selected, deployed }
 
 class HudTroop extends PositionComponent
     with TapCallbacks, HasGameReference<JynvahlGame> {
   final int index;
-  final Unit unit;
+  final Troop troop;
   late TroopState state;
 
   HudTroop({
-    required this.unit,
+    required this.troop,
     required Vector2 position,
     required Vector2 size,
     required this.index,
