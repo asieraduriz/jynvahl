@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:jynvahl_hex_game/battleground/bottom_hud.dart';
 import 'package:jynvahl_hex_game/battleground/hud_troop.dart';
 import 'package:jynvahl_hex_game/battleground/manager.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
@@ -9,18 +10,6 @@ import 'package:jynvahl_hex_game/map/pathfinding.dart';
 import 'package:jynvahl_hex_game/map/tile.dart';
 import 'package:jynvahl_hex_game/players/player.dart';
 import 'package:jynvahl_hex_game/players/troop.dart';
-import 'package:jynvahl_hex_game/settings.dart';
-
-Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
-  double x = startX + column * horizontalSpacing;
-  double y = startY + row * verticalSpacing;
-
-  if (column % 2 == 1) {
-    y += verticalSpacing / 2;
-  }
-
-  return Vector2(x, y);
-}
 
 final int numRows = 7;
 final int numCols = 8;
@@ -34,7 +23,9 @@ class Battleground extends PositionComponent with TapCallbacks {
   final List<HudTroop> hudTroops = [];
   final List<PlayingTroop> deployedSprites = [];
 
-  final Map<Hex, PlayingTroop> _opponentLineup = {};
+  final Map<Hex, Troop> _opponentLineup = {};
+
+  late final BottomHud bottomHud;
 
   late BattlegroundManager battlegroundManager;
 
@@ -45,6 +36,13 @@ class Battleground extends PositionComponent with TapCallbacks {
   }) : super(size: size) {
     this.battlegroundManager = BattlegroundManager(mapId: mapId)
       ..battleState = BattleState.placing;
+
+    _opponentLineup.addAll({
+      Hex(5, 2): Troop(id: 1, name: "Frost Troll Warrior"),
+      Hex(6, 1): Troop(id: 2, name: "Frost Troll Archer"),
+      Hex(6, 2): Troop(id: 3, name: "Frost Troll Shaman"),
+      Hex(7, -1): Troop(id: 4, name: "Frost Troll Berserker"),
+    });
   }
 
   @override
@@ -59,10 +57,25 @@ class Battleground extends PositionComponent with TapCallbacks {
     });
 
     // load opponent lineup
-    _opponentLineup.clear();
     loadOpponentLineup();
 
-    // Adding items to the "HUD"
+    loadPlayerHUD();
+    loadBottomHUD();
+  }
+
+  void loadOpponentLineup() {
+    _opponentLineup.entries.forEach((troopEntry) {
+      final hex = troopEntry.key, troop = troopEntry.value;
+      final playingTroop = PlayingTroop(
+        position: _hexMap[hex]!.position,
+        name: troop.name,
+      );
+
+      add(playingTroop);
+    });
+  }
+
+  void loadPlayerHUD() {
     player.troops.forEachIndexed((index, troop) {
       final positionX = 40 + (70.0 * index);
       final hudTroop = HudTroop(
@@ -77,17 +90,13 @@ class Battleground extends PositionComponent with TapCallbacks {
     });
   }
 
-  void loadOpponentLineup() {
-    List<Hex> lineupPositions = [Hex(5, 2), Hex(6, 1), Hex(6, 2), Hex(7, -1)];
+  void loadBottomHUD() {
+    bottomHud = BottomHud(
+      size: Vector2.all(48),
+      opponentLineup: _opponentLineup.values.toList(),
+    );
 
-    lineupPositions.forEach((position) {
-      final troop = PlayingTroop(
-        position: _hexMap[position]!.position,
-        name: 'troll',
-      );
-      _opponentLineup[position] = troop;
-      add(troop);
-    });
+    add(bottomHud);
   }
 
   @override
