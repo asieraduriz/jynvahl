@@ -6,7 +6,7 @@ import 'package:jynvahl_hex_game/battleground/manager.dart';
 import 'package:jynvahl_hex_game/battleground/top_hud.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
 import 'package:jynvahl_hex_game/map/map.dart';
-import 'package:jynvahl_hex_game/map/pathfinding.dart';
+// import 'package:jynvahl_hex_game/map/pathfinding.dart';
 import 'package:jynvahl_hex_game/map/tile.dart';
 import 'package:jynvahl_hex_game/players/player.dart';
 import 'package:jynvahl_hex_game/players/troop.dart';
@@ -135,9 +135,15 @@ class Battleground extends PositionComponent
             // Set the deployed HUD troop state back to idle
             topHud.undeployTroop(deployedTroop);
 
-            // Find first idle troop in HUD and set it to selected
-
+            // Remove deployed troop from bottom HUD
+            bottomHud.removeDeployedTroop(deployedTroop);
             // Remove deployed sprite
+            children
+                .whereType<PlayingTroop>()
+                .firstWhere(
+                  (playingTroop) => playingTroop.id == deployedTroop.id,
+                )
+                .removeFromParent();
 
             return;
           }
