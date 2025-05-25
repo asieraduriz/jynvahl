@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +55,6 @@ class HudTroop extends PositionComponent
 
   @override
   void update(double dt) {
-    // TODO: implement update
     setBackground();
   }
 

@@ -37,7 +37,7 @@ List<Hex>? findPathAStar({
       return _reconstructPathAStar(cameFrom, current);
     }
 
-    final neighborHexes = getNeighbourCoordinates(current, 1);
+    final neighborHexes = current.getNeighbourCoordinates(1);
     final walkableHexes =
         neighborHexes.where((hex) {
           final tile = hexMap[hex];

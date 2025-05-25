@@ -1,26 +1,17 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
-import 'package:jynvahl_hex_game/battleground/hud.dart';
 import 'package:jynvahl_hex_game/battleground/hud_troop.dart';
 import 'package:jynvahl_hex_game/battleground/manager.dart';
 import 'package:jynvahl_hex_game/map/hex.dart';
-import 'package:jynvahl_hex_game/map/onMapTapController.dart';
+import 'package:jynvahl_hex_game/map/map.dart';
 import 'package:jynvahl_hex_game/map/pathfinding.dart';
 import 'package:jynvahl_hex_game/map/tile.dart';
 import 'package:jynvahl_hex_game/players/player.dart';
 import 'package:jynvahl_hex_game/players/unit.dart';
+import 'package:jynvahl_hex_game/settings.dart';
 
 Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
-  final horizontalSpacing = 1.5 * hexRadius;
-  final verticalSpacing = sqrt(3) * hexRadius;
-  final startX = 50.0;
-  final startY = 150.0;
-
   double x = startX + column * horizontalSpacing;
   double y = startY + row * verticalSpacing;
 
@@ -31,14 +22,13 @@ Vector2 calculateHexOrigin(int row, int column, double hexRadius) {
   return Vector2(x, y);
 }
 
-final double hexRadius = 50.0;
 final int numRows = 7;
 final int numCols = 8;
 
 class Battleground extends PositionComponent with TapCallbacks {
   final String mapId;
-  final Map<Hex, HexagonTile> _hexMap = {};
 
+  late Map<Hex, HexagonTile> _hexMap = {};
   final Player player;
   final Map<Hex, Unit?> playerLineup = {};
   final List<HudTroop> hudTroops = [];
@@ -59,11 +49,17 @@ class Battleground extends PositionComponent with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    loadMap(mapId);
+    _hexMap = loadMap(mapId);
+    _hexMap.forEach((hex, tile) {
+      if (tile.isPlaceable) {
+        playerLineup[hex] = null;
+      }
 
-    // load opponent unitsl
+      add(tile);
+    });
+
+    // load opponent units
     loadOpponentUnits();
-    // add(HudTroop(position: Vector2(68.0, 20), size: Vector2.all(70)));
 
     // Adding items to the "HUD"
     player.units.forEachIndexed((index, unit) {
@@ -78,46 +74,6 @@ class Battleground extends PositionComponent with TapCallbacks {
       hudTroops.add(hudTroop);
       add(hudTroop);
     });
-  }
-
-  void loadMap(String mapId) {
-    for (int row = 0; row < numRows; row++) {
-      for (int col = 0; col < numCols; col++) {
-        final origin = calculateHexOrigin(row, col, hexRadius);
-        final id = "hex_${row} ${col}";
-
-        final axial_coords = oddq_to_axial(row, col);
-        final isImpassable = axial_coords.q == 1 && axial_coords.r > 0;
-
-        final isPlaceable = [
-          Hex(1, 0),
-          Hex(2, 0),
-          Hex(0, 3),
-          Hex(2, -1),
-        ].contains(axial_coords);
-
-        final hexagon = HexagonTile(
-          id: id,
-          origin: origin,
-          hexSize: hexRadius,
-          color:
-              isImpassable
-                  ? Colors.blueGrey
-                  : isPlaceable
-                  ? Colors.lightBlue
-                  : Colors.green,
-          text: "${axial_coords.q}, ${axial_coords.r}",
-          isImpassable: isImpassable,
-          isPlaceable: isPlaceable,
-        );
-
-        _hexMap[axial_coords] = hexagon;
-        if (isPlaceable) {
-          playerLineup[axial_coords] = null;
-        }
-        add(hexagon);
-      }
-    }
   }
 
   void loadOpponentUnits() {
@@ -154,24 +110,24 @@ class Battleground extends PositionComponent with TapCallbacks {
         if (tile.isPlaceable) {
           // if tile has unit, remove unit
           if (playerLineup[hex] != null) {
-            print("There is already a unit");
+            // Get deployed troom from Hex
             final deployedTroop = playerLineup[hex]!;
-            playerLineup[hex] = null;
+            playerLineup[hex] = null; // Remove unit from lineup
 
+            // Set the deployed HUD troop state back to idle
             hudTroops
                 .firstWhere((troop) => troop.unit.id == deployedTroop.id)
                 .state = TroopState.idle;
 
-            // Handle selected HUD troop
-            final firstIdleTroop = hudTroops.firstWhere(
-              (troop) => troop.state == TroopState.idle,
-            );
+            // Find first idle troop in HUD and set it to selected
             hudTroops.forEach((troop) {
               if (troop.state == TroopState.selected) {
                 troop.state = TroopState.idle;
               }
             });
-            firstIdleTroop.state = TroopState.selected;
+            hudTroops
+                .firstWhere((troop) => troop.state == TroopState.idle)
+                .state = TroopState.selected;
 
             // Remove deployed sprite
             final spriteToDelete = deployedSprites.firstWhere(
@@ -211,6 +167,8 @@ class Battleground extends PositionComponent with TapCallbacks {
               (troop) => troop.state == TroopState.idle,
             );
             firstIdleTroop?.state = TroopState.selected;
+
+            return;
           }
         }
 
@@ -295,17 +253,6 @@ class Battleground extends PositionComponent with TapCallbacks {
       return;
     }
   }
-  // switch (selectedTroop.state) {
-  //   case TroopState.idle:
-  //     selectedTroop.state = TroopState.selected;
-  //     break;
-  //   case TroopState.selected:
-  //     selectedTroop.state = TroopState.deployed;
-  //     break;
-  //   case TroopState.deployed:
-  //     selectedTroop.state = TroopState.idle;
-  //     break;
-  // }
 
   Map<Hex, HexagonTile> _nativelyFindBoudingHex(Vector2 tappedAt) =>
       Map.fromEntries(
