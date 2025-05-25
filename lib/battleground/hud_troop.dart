@@ -8,16 +8,17 @@ enum TroopState { idle, selected, deployed }
 
 class HudTroop extends PositionComponent
     with TapCallbacks, HasGameReference<JynvahlGame> {
-  final int index;
   final Troop troop;
   late TroopState state;
+
+  Function onSelectTroop;
 
   HudTroop({
     required this.troop,
     required Vector2 position,
     required Vector2 size,
-    required this.index,
     required this.state,
+    required this.onSelectTroop,
   }) : super(position: position, size: size);
 
   late RectangleComponent backgroundRectange;
@@ -33,10 +34,12 @@ class HudTroop extends PositionComponent
 
     final image = await game.loadSprite(troop.spritePath);
     troopPortrait = SpriteComponent(sprite: image, size: size);
-    if (state == TroopState.idle) {
-      troopPortrait.flipHorizontallyAroundCenter();
-    }
     add(troopPortrait);
+  }
+
+  void setState(TroopState newState) {
+    state = newState;
+    setBackground();
   }
 
   void setBackground() {
@@ -54,12 +57,7 @@ class HudTroop extends PositionComponent
   }
 
   @override
-  void update(double dt) {
-    setBackground();
-  }
-
-  @override
   void onTapUp(TapUpEvent event) {
-    game.battleground.onHudTroopTapped(this);
+    onSelectTroop(troop.id);
   }
 }

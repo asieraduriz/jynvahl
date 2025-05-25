@@ -34,7 +34,7 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
     add(textComponent);
 
     // Add opponent lineup
-    for (var i = 0; i < opponentLineup.length; i++) {
+    for (int i = 0; i < opponentLineup.length; i++) {
       final troop = opponentLineup[i];
       final component = PlayingTroop(
         position: Vector2(size.x / 2 + (i + 1) * 70, size.y / 2),
@@ -49,7 +49,7 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
 
   addDeployedTroop(Troop troop) {
     playerLineup.add(troop);
-    print("Added troop, total is ${playerLineup.length}");
+
     final playingTroop = PlayingTroop(
       position: Vector2(size.x / 2 - (playerLineup.length) * 70, size.y / 2),
       name: troop.name,
@@ -62,7 +62,6 @@ class BottomHud extends PositionComponent with HasGameReference<JynvahlGame> {
 
   removeDeployedTroop(Troop troop) {
     // Remove all player troops from HUD
-    print("Player lineup: ${playerLineup.map((e) => e.id).join(', ')}");
     children.whereType<PlayingTroop>().forEach((troopComponent) {
       final isPlayerTroop = playerLineup.any(
         (troopEntry) => troopEntry.id == troopComponent.id,
