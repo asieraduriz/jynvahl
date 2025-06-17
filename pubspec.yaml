@@ -36,3 +36,5 @@ flutter:
     - assets/images/
     - assets/tiled/
     - assets/tiles/
+dev_dependencies:
+  test: ^1.26.2
