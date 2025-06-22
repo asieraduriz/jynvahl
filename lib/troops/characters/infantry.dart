@@ -11,11 +11,15 @@ class InfantryTroop extends BaseTroop with Armored {
     double? health,
     Map<DamageType, double>? baseDamage,
     double? armorRating,
+    required int level,
+    required int experience,
   }) : armorRating = armorRating ?? 10.0,
        super(
          name: "Infantry Troop",
          health: health ?? 120,
          baseDamage: baseDamage ?? {DamageType.physical: 18.0},
+         level: level,
+         experience: experience,
        );
 
   @override
@@ -24,4 +28,12 @@ class InfantryTroop extends BaseTroop with Armored {
     TraitType.MELEE,
     TraitType.ARMORED,
   ];
+
+  @override
+  void updateStatsForLevel() {
+    // TODO: implement updateStatsForLevel
+    throw UnimplementedError(
+      "InfantryTroop.updateStatsForLevel is not implemented yet.",
+    );
+  }
 }

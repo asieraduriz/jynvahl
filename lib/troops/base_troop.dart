@@ -5,15 +5,20 @@ import 'package:jynvahl_hex_game/troops/weaknesses/interactions.dart';
 abstract class BaseTroop {
   final String name;
   double health;
-  final Map<DamageType, double> _baseDamage;
+  final Map<DamageType, double> baseDamage;
+
+  int level;
+  int experience;
 
   BaseTroop({
     required this.name,
     required this.health,
-    required Map<DamageType, double> baseDamage,
-  }) : _baseDamage = baseDamage;
+    required this.baseDamage,
+    required this.level,
+    required this.experience,
+  }) {}
 
-  DamageProfile get baseDamageProfile => DamageProfile(_baseDamage);
+  DamageProfile get baseDamageProfile => DamageProfile(baseDamage);
   DamageProfile calculateOutgoingDamage() => baseDamageProfile;
 
   void takeDamage(double amount, DamageType type) {
@@ -55,4 +60,6 @@ abstract class BaseTroop {
   List<TraitType> get traits;
 
   bool hasTrait(TraitType type) => traits.contains(type);
+
+  void updateStatsForLevel();
 }

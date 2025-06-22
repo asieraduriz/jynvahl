@@ -10,7 +10,12 @@ void main() {
     test('Takes less physical damage', () {
       final armorRating = 20.0;
       final health = 50.0;
-      final infantry = InfantryTroop(armorRating: armorRating, health: health);
+      final infantry = InfantryTroop(
+        level: 1,
+        experience: 0,
+        armorRating: armorRating,
+        health: health,
+      );
 
       expect(infantry.armorRating, armorRating);
       infantry.takeDamage(10.0, DamageType.physical);
@@ -25,7 +30,12 @@ void main() {
     test('Takes full damage from magic', () {
       final armorRating = 20.0;
       final health = 50.0;
-      final infantry = InfantryTroop(armorRating: armorRating, health: health);
+      final infantry = InfantryTroop(
+        level: 1,
+        experience: 0,
+        armorRating: armorRating,
+        health: health,
+      );
 
       infantry.takeDamage(10.0, DamageType.magical);
 
@@ -37,8 +47,15 @@ void main() {
     });
 
     test('Takes higher damage from archer', () {
-      final infantryTroop = InfantryTroop(armorRating: 10.0, health: 100.0);
+      final infantryTroop = InfantryTroop(
+        level: 1,
+        experience: 0,
+        armorRating: 10.0,
+        health: 100.0,
+      );
       final archerTroop = ArcherTroop(
+        level: 1,
+        experience: 0,
         baseDamage: {DamageType.physical: 30.0},
         health: 80.0,
       );
@@ -55,7 +72,7 @@ void main() {
   group('Archer Troop Tests', () {
     test('Takes full damage from physical', () {
       final health = 50.0;
-      final archer = ArcherTroop(health: health);
+      final archer = ArcherTroop(level: 1, experience: 0, health: health);
 
       archer.takeDamage(10.0, DamageType.physical);
 
@@ -64,7 +81,7 @@ void main() {
 
     test('Takes full damage from magic', () {
       final health = 50.0;
-      final archer = ArcherTroop(health: health);
+      final archer = ArcherTroop(level: 1, experience: 0, health: health);
 
       archer.takeDamage(10.0, DamageType.magical);
 
@@ -77,11 +94,15 @@ void main() {
 
     test('Takes higher damage from cavalry', () {
       final cavalryTroop = CavalryTroop(
+        level: 1,
+        experience: 0,
         health: 100.0,
         baseDamage: {DamageType.physical: 30.0},
       );
       const startingHealth = 80.0;
       final archerTroop = ArcherTroop(
+        level: 1,
+        experience: 0,
         baseDamage: {DamageType.physical: 30.0},
         health: startingHealth,
       );
@@ -95,7 +116,7 @@ void main() {
   group('Cavalry Troop Tests', () {
     test('Takes full damage from physical', () {
       final health = 50.0;
-      final cavalry = CavalryTroop(health: health);
+      final cavalry = CavalryTroop(level: 1, experience: 0, health: health);
 
       cavalry.takeDamage(10.0, DamageType.physical);
 
@@ -104,7 +125,7 @@ void main() {
 
     test('Takes full damage from magic', () {
       final health = 50.0;
-      final infantry = CavalryTroop(health: health);
+      final infantry = CavalryTroop(level: 1, experience: 0, health: health);
 
       infantry.takeDamage(10.0, DamageType.magical);
 
@@ -113,13 +134,19 @@ void main() {
 
     test('Takes higher damage from infantry', () {
       final infantryTroop = InfantryTroop(
+        level: 1,
+        experience: 0,
         armorRating: 10.0,
         health: 100.0,
         baseDamage: {DamageType.physical: 30.0},
       );
 
       const startingHealth = 80.0;
-      final cavalryTroop = CavalryTroop(health: startingHealth);
+      final cavalryTroop = CavalryTroop(
+        level: 1,
+        experience: 0,
+        health: startingHealth,
+      );
 
       infantryTroop.attack(cavalryTroop);
 
@@ -130,7 +157,7 @@ void main() {
   group('Mage Troop Tests', () {
     test('Takes full damage from  physical', () {
       final health = 50.0;
-      final mageTroop = MageTroop(health: health);
+      final mageTroop = MageTroop(level: 1, experience: 0, health: health);
 
       mageTroop.takeDamage(10.0, DamageType.physical);
 
@@ -139,7 +166,7 @@ void main() {
 
     test('Takes full damage from magic', () {
       final health = 50.0;
-      final infantry = MageTroop(health: health);
+      final infantry = MageTroop(level: 1, experience: 0, health: health);
 
       infantry.takeDamage(10.0, DamageType.magical);
 
@@ -147,8 +174,10 @@ void main() {
     });
 
     test('Takes higher damage from archer', () {
-      final mageTroop = MageTroop(health: 100.0);
+      final mageTroop = MageTroop(level: 1, experience: 0, health: 100.0);
       final archerTroop = ArcherTroop(
+        level: 1,
+        experience: 0,
         baseDamage: {DamageType.physical: 30.0},
         health: 80.0,
       );
