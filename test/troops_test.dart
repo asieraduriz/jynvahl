@@ -1,5 +1,7 @@
 import 'package:jynvahl_hex_game/troops/characters/archer.dart';
+import 'package:jynvahl_hex_game/troops/characters/cavalry.dart';
 import 'package:jynvahl_hex_game/troops/characters/infantry.dart';
+import 'package:jynvahl_hex_game/troops/characters/mage.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:test/test.dart';
 
@@ -47,6 +49,113 @@ void main() {
         infantryTroop.health,
         100 - (30.0 * 1.25) * 0.9,
       ); // 25% amplify, 10% armor reduction
+      expect(archerTroop.health, 80.0);
+    });
+  });
+  group('Archer Troop Tests', () {
+    test('Takes full damage from physical', () {
+      final health = 50.0;
+      final archer = ArcherTroop(health: health);
+
+      archer.takeDamage(10.0, DamageType.physical);
+
+      expect(archer.health, 40.0);
+    });
+
+    test('Takes full damage from magic', () {
+      final health = 50.0;
+      final archer = ArcherTroop(health: health);
+
+      archer.takeDamage(10.0, DamageType.magical);
+
+      expect(
+        archer.health,
+        40.0,
+        reason: 'Archer should take full damage from magic',
+      );
+    });
+
+    test('Takes higher damage from cavalry', () {
+      final cavalryTroop = CavalryTroop(
+        health: 100.0,
+        baseDamage: {DamageType.physical: 30.0},
+      );
+      const startingHealth = 80.0;
+      final archerTroop = ArcherTroop(
+        baseDamage: {DamageType.physical: 30.0},
+        health: startingHealth,
+      );
+
+      cavalryTroop.attack(archerTroop);
+
+      expect(archerTroop.health, startingHealth - (30.0 * 1.25));
+    });
+  });
+
+  group('Cavalry Troop Tests', () {
+    test('Takes full damage from physical', () {
+      final health = 50.0;
+      final cavalry = CavalryTroop(health: health);
+
+      cavalry.takeDamage(10.0, DamageType.physical);
+
+      expect(cavalry.health, 40.0);
+    });
+
+    test('Takes full damage from magic', () {
+      final health = 50.0;
+      final infantry = CavalryTroop(health: health);
+
+      infantry.takeDamage(10.0, DamageType.magical);
+
+      expect(infantry.health, 40.0);
+    });
+
+    test('Takes higher damage from infantry', () {
+      final infantryTroop = InfantryTroop(
+        armorRating: 10.0,
+        health: 100.0,
+        baseDamage: {DamageType.physical: 30.0},
+      );
+
+      const startingHealth = 80.0;
+      final cavalryTroop = CavalryTroop(health: startingHealth);
+
+      infantryTroop.attack(cavalryTroop);
+
+      expect(cavalryTroop.health, startingHealth - (30.0 * 1.25));
+    });
+  });
+
+  group('Mage Troop Tests', () {
+    test('Takes full damage from  physical', () {
+      final health = 50.0;
+      final mageTroop = MageTroop(health: health);
+
+      mageTroop.takeDamage(10.0, DamageType.physical);
+
+      expect(mageTroop.health, 40.0);
+    });
+
+    test('Takes full damage from magic', () {
+      final health = 50.0;
+      final infantry = MageTroop(health: health);
+
+      infantry.takeDamage(10.0, DamageType.magical);
+
+      expect(infantry.health, 40.0);
+    });
+
+    test('Takes higher damage from archer', () {
+      final mageTroop = MageTroop(health: 100.0);
+      final archerTroop = ArcherTroop(
+        baseDamage: {DamageType.physical: 30.0},
+        health: 80.0,
+      );
+
+      archerTroop.attack(mageTroop);
+
+      expect(mageTroop.health, 100 - (30.0 * 1.25));
       expect(archerTroop.health, 80.0);
     });
   });
