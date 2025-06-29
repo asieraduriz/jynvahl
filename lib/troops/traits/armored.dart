@@ -1,4 +1,4 @@
-import 'package:jynvahl_hex_game/troops/base_troop.dart';
+import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 
 mixin Armored on BaseTroop {

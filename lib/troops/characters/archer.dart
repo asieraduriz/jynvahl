@@ -1,5 +1,6 @@
-import 'package:jynvahl_hex_game/troops/base_troop.dart';
+import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
+import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
 class ArcherTroop extends BaseTroop {
@@ -8,22 +9,22 @@ class ArcherTroop extends BaseTroop {
     Map<DamageType, double>? baseDamage,
     required int level,
     required int experience,
+    required TroopRarity rarity,
+    required int rarityEmblems,
   }) : super(
          name: "Ranged Archer",
-         health: health ?? 70,
-         baseDamage: baseDamage ?? {DamageType.physical: 25.0},
-         level: level,
+         baseStats: BaseStats(
+           health: health ?? 70,
+           healthPerLevel: 18.0,
+           damage: baseDamage ?? {DamageType.physical: 25.0},
+           damagePerLevel: 2.0,
+           level: level,
+           rarity: rarity,
+         ),
          experience: experience,
+         rarityEmblems: rarityEmblems,
        );
 
   @override
   List<TraitType> get traits => [TraitType.PHYSICAL, TraitType.RANGED];
-
-  @override
-  void updateStatsForLevel() {
-    // TODO: implement updateStatsForLevel
-    throw UnimplementedError(
-      "ArcherTroop.updateStatsForLevel is not implemented yet.",
-    );
-  }
 }

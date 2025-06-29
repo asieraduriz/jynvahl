@@ -1,19 +1,30 @@
-import 'package:jynvahl_hex_game/troops/base_troop.dart';
+import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
+import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
 class MageTroop extends BaseTroop {
+  // Mixin traits
+
   MageTroop({
     double? health,
     Map<DamageType, double>? baseDamage,
     required int level,
     required int experience,
+    required TroopRarity rarity,
+    required int rarityEmblems,
   }) : super(
          name: "Mage",
-         health: health ?? 60,
-         baseDamage: baseDamage ?? {DamageType.magical: 22.0},
-         level: level,
+         baseStats: BaseStats(
+           health: health ?? 60,
+           healthPerLevel: 10.0,
+           damage: baseDamage ?? {DamageType.magical: 22.0},
+           damagePerLevel: 3.0,
+           level: level,
+           rarity: rarity,
+         ),
          experience: experience,
+         rarityEmblems: rarityEmblems,
        );
 
   @override
@@ -22,12 +33,4 @@ class MageTroop extends BaseTroop {
     TraitType.MAGIC_CASTER,
     TraitType.RANGED,
   ];
-
-  @override
-  void updateStatsForLevel() {
-    // TODO: implement updateStatsForLevel
-    throw UnimplementedError(
-      "MageTroop.updateStatsForLevel is not implemented yet.",
-    );
-  }
 }

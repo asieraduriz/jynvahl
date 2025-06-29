@@ -1,9 +1,11 @@
-import 'package:jynvahl_hex_game/troops/base_troop.dart';
+import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
+import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/armored.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
 class InfantryTroop extends BaseTroop with Armored {
+  // Mixin traits
   @override
   final double armorRating;
 
@@ -13,13 +15,21 @@ class InfantryTroop extends BaseTroop with Armored {
     double? armorRating,
     required int level,
     required int experience,
+    required TroopRarity rarity,
+    required int rarityEmblems,
   }) : armorRating = armorRating ?? 10.0,
        super(
          name: "Infantry Troop",
-         health: health ?? 120,
-         baseDamage: baseDamage ?? {DamageType.physical: 18.0},
-         level: level,
+         baseStats: BaseStats(
+           health: health ?? 120,
+           healthPerLevel: 18.0,
+           damage: baseDamage ?? {DamageType.physical: 18.0},
+           damagePerLevel: 2.0,
+           level: level,
+           rarity: rarity,
+         ),
          experience: experience,
+         rarityEmblems: rarityEmblems,
        );
 
   @override
@@ -28,12 +38,4 @@ class InfantryTroop extends BaseTroop with Armored {
     TraitType.MELEE,
     TraitType.ARMORED,
   ];
-
-  @override
-  void updateStatsForLevel() {
-    // TODO: implement updateStatsForLevel
-    throw UnimplementedError(
-      "InfantryTroop.updateStatsForLevel is not implemented yet.",
-    );
-  }
 }
