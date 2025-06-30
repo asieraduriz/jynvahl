@@ -14,10 +14,10 @@ class CavalryTroop extends BaseTroop {
   }) : super(
          name: "Cavalry Troop",
          baseStats: BaseStats(
-           health: health ?? 150,
-           healthPerLevel: 18.0,
-           damage: baseDamage ?? {DamageType.physical: 30.0},
-           damagePerLevel: 2.0,
+           health: health ?? 120,
+           healthPerLevel: 15.0,
+           damage: baseDamage ?? {DamageType.physical: 25.0},
+           damagePerLevel: 3.0,
            level: level,
            rarity: rarity,
          ),

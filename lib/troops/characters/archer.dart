@@ -15,9 +15,9 @@ class ArcherTroop extends BaseTroop {
          name: "Ranged Archer",
          baseStats: BaseStats(
            health: health ?? 70,
-           healthPerLevel: 18.0,
-           damage: baseDamage ?? {DamageType.physical: 25.0},
-           damagePerLevel: 2.0,
+           healthPerLevel: 11.0,
+           damage: baseDamage ?? {DamageType.physical: 20.0},
+           damagePerLevel: 5.0,
            level: level,
            rarity: rarity,
          ),

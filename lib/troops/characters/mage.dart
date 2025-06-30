@@ -17,9 +17,9 @@ class MageTroop extends BaseTroop {
          name: "Mage",
          baseStats: BaseStats(
            health: health ?? 60,
-           healthPerLevel: 10.0,
+           healthPerLevel: 8.0,
            damage: baseDamage ?? {DamageType.magical: 22.0},
-           damagePerLevel: 3.0,
+           damagePerLevel: 8.0,
            level: level,
            rarity: rarity,
          ),
