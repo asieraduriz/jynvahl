@@ -1,9 +1,14 @@
 import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:jynvahl_hex_game/troops/rarity.dart';
+import 'package:jynvahl_hex_game/troops/traits/has_movement.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
-class ArcherTroop extends BaseTroop {
+class ArcherTroop extends BaseTroop with HasMovement {
+  // Mixin traits
+  @override
+  int get baseMovement => 3;
+
   ArcherTroop({
     double? health,
     Map<DamageType, double>? baseDamage,

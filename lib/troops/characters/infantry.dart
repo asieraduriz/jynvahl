@@ -2,12 +2,16 @@ import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/armored.dart';
+import 'package:jynvahl_hex_game/troops/traits/has_movement.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
-class InfantryTroop extends BaseTroop with Armored {
+class InfantryTroop extends BaseTroop with Armored, HasMovement {
   // Mixin traits
   @override
   final double armorRating;
+
+  @override
+  int get baseMovement => 3;
 
   InfantryTroop({
     double? health,
