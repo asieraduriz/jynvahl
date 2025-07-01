@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
@@ -8,7 +10,7 @@ class BaseStats {
   double healthPerLevel;
 
   DamageProfile damage;
-  double damagePerLevel;
+  DamageProfile damagePerLevel;
 
   int level;
   TroopRarity rarity;
@@ -42,6 +44,8 @@ abstract class BaseTroop {
 
   late DamageProfile effectiveDamage;
 
+  final Random _random = Random();
+
   BaseTroop({
     required this.name,
     required this.baseStats,
@@ -56,8 +60,13 @@ abstract class BaseTroop {
     _currentHealth =
         baseStats.health + (effectiveLevel * baseStats.healthPerLevel);
     effectiveDamage = baseStats.damage.map(
-      (type, value) =>
-          MapEntry(type, value + effectiveLevel * baseStats.damagePerLevel),
+      (type, value) => MapEntry(
+        type,
+        DamageRange(
+          value.min + effectiveLevel * baseStats.damagePerLevel[type]!.min,
+          value.max + effectiveLevel * baseStats.damagePerLevel[type]!.max,
+        ),
+      ),
     );
   }
 
@@ -73,7 +82,11 @@ abstract class BaseTroop {
     final weaknessInteraction = getWeaknessInteraction(this, target);
     if (weaknessInteraction != null) {
       for (final type in damages.keys.toList()) {
-        damages[type] = damages[type]! * weaknessInteraction.multiplier;
+        final damageRange = damages[type]!;
+        damages[type] = DamageRange(
+          damageRange.min * weaknessInteraction.multiplier,
+          damageRange.max * weaknessInteraction.multiplier,
+        );
       }
       print('  Effect: ${weaknessInteraction.message}');
     }
@@ -90,25 +103,17 @@ abstract class BaseTroop {
   }
 
   void attack(BaseTroop target) {
-    final Map<DamageType, double> finalDamages = Map.from(effectiveDamage);
-
-    print('\n${name} performs an attack on ${target.name}.');
-
-    final weaknessInteraction = getWeaknessInteraction(this, target);
-    if (weaknessInteraction != null) {
-      for (final type in finalDamages.keys.toList()) {
-        finalDamages[type] =
-            finalDamages[type]! * weaknessInteraction.multiplier;
-      }
-      print('  Effect: ${weaknessInteraction.message}');
-    }
+    final DamageProfile finalDamages = calculateOutgoingDamage(target);
 
     for (final entry in finalDamages.entries) {
       final damageType = entry.key;
       final damageAmount = entry.value;
 
-      if (damageAmount > 0) {
-        target.takeDamage(damageAmount, damageType);
+      final double dealtDamage =
+          (_random.nextDouble() * (damageAmount.max - damageAmount.min)) +
+          damageAmount.min;
+      if (dealtDamage > 0) {
+        target.takeDamage(dealtDamage, damageType);
       }
     }
   }

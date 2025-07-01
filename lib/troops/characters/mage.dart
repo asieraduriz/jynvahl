@@ -14,19 +14,22 @@ class MageTroop extends BaseTroop with HasMovement, HasRange {
   int get baseRange => 3;
 
   MageTroop({
+    String? name,
     double? health,
-    Map<DamageType, double>? baseDamage,
+    DamageProfile? baseDamage,
+    DamageProfile? damagePerLevel,
     required int level,
     required int experience,
     required TroopRarity rarity,
     required int rarityEmblems,
   }) : super(
-         name: "Mage",
+         name: name ?? "Mage",
          baseStats: BaseStats(
            health: health ?? 60,
            healthPerLevel: 8.0,
-           damage: baseDamage ?? {DamageType.magical: 22.0},
-           damagePerLevel: 8.0,
+           damage: baseDamage ?? {DamageType.magical: DamageRange(14.0, 30.0)},
+           damagePerLevel:
+               damagePerLevel ?? {DamageType.magical: DamageRange(8.0, 8.0)},
            level: level,
            rarity: rarity,
          ),

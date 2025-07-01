@@ -15,8 +15,10 @@ class InfantryTroop extends BaseTroop with Armored, HasMovement, IsMelee {
   int get baseMovement => 3;
 
   InfantryTroop({
+    String? name,
     double? health,
-    Map<DamageType, double>? baseDamage,
+    DamageProfile? baseDamage,
+    DamageProfile? damagePerLevel,
     double? armorRating,
     required int level,
     required int experience,
@@ -24,12 +26,13 @@ class InfantryTroop extends BaseTroop with Armored, HasMovement, IsMelee {
     required int rarityEmblems,
   }) : armorRating = armorRating ?? 10.0,
        super(
-         name: "Infantry Troop",
+         name: name ?? "Infantry Troop",
          baseStats: BaseStats(
            health: health ?? 120,
            healthPerLevel: 18.0,
-           damage: baseDamage ?? {DamageType.physical: 18.0},
-           damagePerLevel: 2.0,
+           damage: baseDamage ?? {DamageType.physical: DamageRange(16.0, 20.0)},
+           damagePerLevel:
+               damagePerLevel ?? {DamageType.physical: DamageRange(2.0, 2.0)},
            level: level,
            rarity: rarity,
          ),

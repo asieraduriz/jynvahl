@@ -11,19 +11,22 @@ class CavalryTroop extends BaseTroop with HasMovement, IsMelee {
   int get baseMovement => 4;
 
   CavalryTroop({
+    String? name,
     double? health,
-    Map<DamageType, double>? baseDamage,
+    DamageProfile? baseDamage,
+    DamageProfile? damagePerLevel,
     required int level,
     required int experience,
     required TroopRarity rarity,
     required int rarityEmblems,
   }) : super(
-         name: "Cavalry Troop",
+         name: name ?? "Cavalry Troop",
          baseStats: BaseStats(
            health: health ?? 120,
            healthPerLevel: 15.0,
-           damage: baseDamage ?? {DamageType.physical: 25.0},
-           damagePerLevel: 3.0,
+           damage: baseDamage ?? {DamageType.physical: DamageRange(22.0, 28.0)},
+           damagePerLevel:
+               damagePerLevel ?? {DamageType.physical: DamageRange(3.0, 3.0)},
            level: level,
            rarity: rarity,
          ),

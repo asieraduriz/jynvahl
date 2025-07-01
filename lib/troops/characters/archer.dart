@@ -14,19 +14,22 @@ class ArcherTroop extends BaseTroop with HasMovement, HasRange {
   int get baseRange => 4;
 
   ArcherTroop({
+    String? name,
     double? health,
-    Map<DamageType, double>? baseDamage,
+    DamageProfile? baseDamage,
+    DamageProfile? damagePerLevel,
     required int level,
     required int experience,
     required TroopRarity rarity,
     required int rarityEmblems,
   }) : super(
-         name: "Ranged Archer",
+         name: name ?? "Ranged Archer",
          baseStats: BaseStats(
            health: health ?? 70,
            healthPerLevel: 11.0,
-           damage: baseDamage ?? {DamageType.physical: 20.0},
-           damagePerLevel: 5.0,
+           damage: baseDamage ?? {DamageType.physical: DamageRange(18.0, 22.0)},
+           damagePerLevel:
+               damagePerLevel ?? {DamageType.physical: DamageRange(2.0, 2.0)},
            level: level,
            rarity: rarity,
          ),
