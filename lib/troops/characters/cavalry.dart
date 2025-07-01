@@ -2,9 +2,10 @@ import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/has_movement.dart';
+import 'package:jynvahl_hex_game/troops/traits/is_melee.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
-class CavalryTroop extends BaseTroop with HasMovement {
+class CavalryTroop extends BaseTroop with HasMovement, IsMelee {
   // Mixin traits
   @override
   int get baseMovement => 4;

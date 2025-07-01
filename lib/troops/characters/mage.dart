@@ -2,12 +2,16 @@ import 'package:jynvahl_hex_game/troops/characters/base_troop.dart';
 import 'package:jynvahl_hex_game/troops/damage_profile.dart';
 import 'package:jynvahl_hex_game/troops/rarity.dart';
 import 'package:jynvahl_hex_game/troops/traits/has_movement.dart';
+import 'package:jynvahl_hex_game/troops/traits/has_range.dart';
 import 'package:jynvahl_hex_game/troops/traits/trait_types.dart';
 
-class MageTroop extends BaseTroop with HasMovement {
+class MageTroop extends BaseTroop with HasMovement, HasRange {
   // Mixin traits
   @override
   int get baseMovement => 3;
+
+  @override
+  int get baseRange => 3;
 
   MageTroop({
     double? health,
